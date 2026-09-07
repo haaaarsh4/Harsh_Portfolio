@@ -16,24 +16,35 @@ export default function FloatingBird() {
     let raf: number;
     let t0: number | null = null;
 
-    // Horizontal speed as a fraction of container width per second.
-    // (Keeps the original "vw-based" feel, but scaled off real measurements.)
+    // Horizontal speed as a fraction of container width per second, with a
+    // floor so the bird never crawls on narrow phone viewports (a fixed
+    // fraction of a 380px-wide screen is a tiny, sluggish-looking speed).
     const SPEED_FRACTION = 0.065; // ~6.5% of container width per second
+    const MIN_SPEED_PX   = 70;    // floor, in px/second
     const START_PHASE    = 0.35;  // where in the loop the bird starts (0..1)
 
     // ── Dynamic container / bird measurements ──────────────────────
+    // NOTE: `container` is only used for vertical sizing (containerHeight)
+    // and to convert viewport-space x back into this element's local
+    // coordinate space (since wrapEl is position:absolute inside it).
+    // The horizontal travel itself is always computed against the full
+    // browser viewport width, so the bird truly exits off both edges of
+    // the screen even when its positioned ancestor is a narrower,
+    // centered content wrapper.
     const container = (wrapEl.offsetParent as HTMLElement) || wrapEl.parentElement;
 
-    let containerWidth  = 0;
-    let containerHeight = 0;
+    let viewportWidth    = 0;
+    let containerHeight  = 0;
+    let containerLeft    = 0; // container's left edge, relative to viewport
     let birdWidth        = 0;
 
     function measure() {
       const rect = container
         ? container.getBoundingClientRect()
-        : { width: window.innerWidth, height: window.innerHeight };
-      containerWidth  = rect.width  || window.innerWidth;
+        : { left: 0, width: window.innerWidth, height: window.innerHeight };
+      viewportWidth   = window.innerWidth;
       containerHeight = rect.height || window.innerHeight;
+      containerLeft   = rect.left || 0;
       // Fall back to the img's own box if it hasn't rendered yet.
       birdWidth = imgEl.getBoundingClientRect().width || imgEl.offsetWidth || 250;
     }
@@ -46,14 +57,18 @@ export default function FloatingBird() {
     if (ro && container) ro.observe(container);
     window.addEventListener("resize", measure);
 
-    // Path spans from fully off-screen-left to fully off-screen-right,
-    // with a full bird-width margin on each side so it's NEVER
-    // partially visible at the wrap points, regardless of screen size.
+    // Path spans from fully off-screen-left to fully off-screen-right of
+    // the BROWSER VIEWPORT (not just the immediate container), with a
+    // full bird-width margin on each side so it's NEVER partially
+    // visible at the wrap points, regardless of screen size or how the
+    // component happens to be nested.
     function getXY(t: number) {
-      const span = containerWidth + birdWidth * 2;
-      const speedPx = SPEED_FRACTION * containerWidth;
+      const span = viewportWidth + birdWidth * 2;
+      const speedPx = Math.max(SPEED_FRACTION * viewportWidth, MIN_SPEED_PX);
       const startPx = START_PHASE * span;
-      const x = -birdWidth + ((startPx + speedPx * t) % span);
+      const viewportX = -birdWidth + ((startPx + speedPx * t) % span);
+      // Convert back into this element's local (container-relative) space.
+      const x = viewportX - containerLeft;
 
       const y = 45
         + Math.sin(t * 0.25)       * 13
@@ -80,9 +95,9 @@ export default function FloatingBird() {
       const cur = getXY(t);
       const nxt = getXY(t + 0.05);
 
-      const speedPx = SPEED_FRACTION * containerWidth;
+      const speedPx = Math.max(SPEED_FRACTION * viewportWidth, MIN_SPEED_PX);
       const dxPx  = nxt.x - cur.x;
-      const dyPct = Math.abs(dxPx) < (containerWidth * 0.02) ? nxt.y - cur.y : 0;
+      const dyPct = Math.abs(dxPx) < (viewportWidth * 0.02) ? nxt.y - cur.y : 0;
       // Convert the y delta (in % of height) to px so bank angle stays
       // proportionate regardless of container aspect ratio.
       const dyPx  = (dyPct / 100) * containerHeight;
@@ -129,9 +144,8 @@ export default function FloatingBird() {
         alt=""
         aria-hidden
         draggable={false}
+        className="floating-bird-img"
         style={{
-          width: 250,
-          height: 250,
           objectFit: "contain",
           display: "block",
           userSelect: "none",

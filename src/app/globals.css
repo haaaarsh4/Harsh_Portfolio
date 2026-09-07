@@ -748,6 +748,14 @@ body.custom-cursor-on, body.custom-cursor-on * { cursor: none !important; }
   line-height: var(--line-height-body); color: var(--color-text-muted);
 }
 
+.floating-bird-img {
+  width: clamp(130px, 22vw, 250px);
+  height: clamp(130px, 22vw, 250px);
+}
+@media (max-width: 700px) {
+  .floating-bird-img { width: clamp(96px, 26vw, 150px); height: clamp(96px, 26vw, 150px); }
+}
+
 /* ---- About ---- */
 .about-container { display: flex; gap: 2.5rem; align-items: flex-start; }
 .about-text { flex: 1; }
@@ -981,15 +989,22 @@ body.custom-cursor-on, body.custom-cursor-on * { cursor: none !important; }
 /* ---- Projects ---- */
 .project-grid-wrap { position: relative; }
 .projects-dino {
-  position: absolute; left: -0.65rem; bottom: -12.2rem;
-  width: clamp(360px, 42vw, 650px); opacity: 0; pointer-events: none; z-index: 0;
-  transform: translateY(12px) rotate(2deg) scale(0.95);
+  position: absolute;
+  left: 0.25rem;
+  right: auto;
+  bottom: -9rem;
+  top: auto;
+  width: clamp(280px, 28vw, 440px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+  transform: translateY(8px) rotate(-2deg) scale(0.96);
 }
-.projects-dino-canvas { width: 100%; height: auto; display: block; image-rendering: auto; mix-blend-mode: multiply; filter: contrast(1.16) brightness(0.82); }
+.projects-dino-canvas { width: 100%; height: auto; display: block; image-rendering: auto; mix-blend-mode: multiply; filter: contrast(1.1) brightness(0.94); }
 .projects-dino.revealed { animation: dinoReveal 0.85s var(--ease-out-expo) 0.18s forwards; }
 @keyframes dinoReveal {
-  from { opacity: 0; transform: translateY(12px) rotate(2deg) scale(0.95); }
-  to { opacity: 0.36; transform: translateY(0) rotate(0deg) scale(1); }
+  from { opacity: 0; transform: translateY(8px) rotate(-2deg) scale(0.96); }
+  to { opacity: 0.2; transform: translateY(0) rotate(0deg) scale(1); }
 }
 .project-route-lines { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: 0; transition: opacity 0.7s ease; }
 .project-route-lines.revealed { opacity: 0.45; }
@@ -1549,6 +1564,8 @@ body.night-mode *:focus-visible { outline-color: #f0a860; }
 }
 
 @media (max-width: 700px) {
+  :root { --size-body: 14.5px; --line-height-body: 1.62; }
+  .section-title { font-size: clamp(46px, 14vw, 64px) !important; }
   .landing-announcement-shell { top: calc(var(--navbar-height) + 0.3rem); }
   .site-banner { align-items: flex-start; gap: 0.35rem; }
   .site-banner-inner { padding: 0.5rem 1rem; }
@@ -1574,15 +1591,13 @@ body.night-mode *:focus-visible { outline-color: #f0a860; }
   .runway-footer { padding: 8rem 0 0; }
   .section-title { max-width: 100%; }
   .about-container { flex-direction: column-reverse; gap: 1.5rem; align-items: center; }
-  .polaroid-wrapper { margin-top: 0; }
-  .polaroid-stack { width: 260px; height: 310px; }
-  .polaroid { width: 260px; }
+  .polaroid-wrapper { display: none; }
   .experience-card { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
   .experience-card-content { flex-direction: column; gap: 0.15rem; }
   .section-experience { margin-top: 2.8rem; }
   .experience-lily { width: clamp(140px, 36vw, 220px); top: -2.1rem; right: 0.15rem; }
   .project-grid { grid-template-columns: repeat(2, 1fr); }
-  .projects-dino { left: -0.1rem; bottom: -8.1rem; width: clamp(300px, 68vw, 500px); }
+  .projects-dino { left: 0.1rem; right: auto; bottom: -5.5rem; top: auto; width: clamp(190px, 48vw, 260px); }
   .project-route-lines { opacity: 0.32; }
   .route-a { width: 40%; left: 6%; top: 38%; transform: rotate(-10deg); }
   .route-b { width: 34%; right: 8%; top: 64%; transform: rotate(11deg); }
@@ -1651,4 +1666,555 @@ body.night-mode *:focus-visible { outline-color: #f0a860; }
       );
     }
   }
+}
+
+/* =========================================================================
+   Featured Projects (home page) — top 4 projects, one row, big photo-top
+   card with a short description at the bottom. Also the "All work" link
+   next to the section heading.
+   ========================================================================= */
+
+.projects-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.all-work-link {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-decoration: none;
+  border: 1px dashed var(--color-border);
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+  background: transparent;
+  opacity: 0;
+}
+.all-work-link.revealed {
+  animation: cardReveal 0.55s var(--ease-out-expo) 0.15s both;
+}
+.all-work-link:hover, .all-work-link:focus-visible {
+  background: rgba(196, 192, 185, 0.25);
+}
+.all-work-link-arrow { transition: transform 0.2s ease; display: inline-block; }
+.all-work-link:hover .all-work-link-arrow { transform: translateX(3px); }
+
+.featured-project-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 1px dashed var(--color-border);
+  border-right: none;
+}
+
+.featured-project-card {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  color: var(--color-text);
+  border-right: 1px dashed var(--color-border);
+  background: transparent;
+  transition: background 0.2s ease;
+  outline: none;
+}
+.section-content.revealed .featured-project-card { animation: cardReveal 0.55s var(--ease-out-expo) both; }
+.section-content.revealed .work-card { animation: cardReveal 0.55s var(--ease-out-expo) both; }
+.featured-project-card:hover, .featured-project-card:focus-visible {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.featured-project-image-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-bottom: 1px dashed var(--color-border);
+}
+.featured-project-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: sepia(0.14) saturate(0.72) contrast(1.02);
+  transition: transform 0.6s var(--ease-out-expo);
+}
+.featured-project-card:hover .featured-project-image,
+.featured-project-card:focus-visible .featured-project-image {
+  transform: scale(1.04);
+}
+
+.featured-project-content { padding: 1rem 1.25rem 1.15rem; }
+.featured-project-name {
+  font-family: var(--font-title);
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--color-text);
+  margin: 0.3rem 0 0.6rem;
+}
+.featured-project-cta {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.featured-project-cta-arrow { transition: transform 0.2s ease; display: inline-block; }
+.featured-project-card:hover .featured-project-cta-arrow { transform: translateX(3px); }
+
+body.night-mode .all-work-link { color: #f7f5f2; border-color: rgba(200, 200, 200, 0.3); }
+body.night-mode .all-work-link:hover { background: rgba(255, 255, 255, 0.08); }
+body.night-mode .featured-project-grid { border-color: rgba(200, 200, 200, 0.2); }
+body.night-mode .featured-project-card { border-right-color: rgba(200, 200, 200, 0.2); }
+body.night-mode .featured-project-card:hover { background: rgba(255, 255, 255, 0.05); }
+body.night-mode .featured-project-image-wrap { border-bottom-color: rgba(200, 200, 200, 0.2); }
+body.night-mode .featured-project-name { color: #f7f5f2; }
+body.night-mode .featured-project-summary { color: rgba(247, 245, 242, 0.6); }
+body.night-mode .featured-project-cta { color: #f0a860; }
+
+@media (max-width: 1024px) {
+  .featured-project-grid { grid-template-columns: repeat(2, 1fr); }
+  .featured-project-card:nth-child(2) { border-right: none; }
+}
+@media (max-width: 640px) {
+  .featured-project-grid { grid-template-columns: 1fr; }
+  .featured-project-card { border-right: none; border-bottom: 1px dashed var(--color-border); }
+  .featured-project-card:last-child { border-bottom: none; }
+}
+/* =========================================================================
+   Subpages — /projects (All Work) and /projects/[slug] (project detail)
+   ========================================================================= */
+
+.subpage-shell {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.subpage-decor-tiger {
+  position: absolute;
+  top: 10rem;
+  right: 8rem;
+  bottom: auto;
+  width: clamp(340px, 32vw, 560px);
+  height: auto;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.3;
+  filter: grayscale(0.85) sepia(0.3) contrast(1.05) brightness(0.92);
+  mix-blend-mode: multiply;
+}
+
+body.night-mode .subpage-decor-tiger {
+  opacity: 0.18;
+  filter: grayscale(1) contrast(1.1) brightness(1.4);
+  mix-blend-mode: screen;
+}
+
+@media (max-width: 1200px) {
+  .subpage-decor-tiger { width: clamp(260px, 38vw, 400px); top: 11rem; right: -0.5rem; }
+}
+@media (max-width: 860px) {
+  .subpage-decor-tiger {
+    top: 13rem;
+    bottom: auto;
+    right: -2rem;
+    width: clamp(300px, 88vw, 420px);
+    opacity: 0.2;
+  }
+}
+
+.subpage-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.subpage-header .navbar-inner { padding: 0.75rem 1.5rem; }
+
+.subpage-main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 6rem;
+  position: relative;
+  z-index: 1;
+}
+
+.subpage-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.subpage-title {
+  font-family: var(--font-title);
+  font-size: clamp(42px, 7vw, 76px);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.subpage-lede {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: var(--line-height-body);
+  color: var(--color-text-muted);
+  max-width: 46ch;
+  margin-bottom: 2.25rem;
+}
+
+.subpage-empty {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  padding: 3rem 0;
+  text-align: center;
+}
+
+/* Filter chips */
+.filter-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+}
+.filter-chip {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.filter-chip:hover, .filter-chip:focus-visible {
+  color: var(--color-text);
+  border-color: var(--color-accent);
+  border-style: solid;
+}
+.filter-chip.active {
+  color: var(--color-bg);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  border-style: solid;
+}
+
+/* All Work page — compact grid, photo reveals as a full-card background on
+   hover with a dark scrim for legibility, no reserved empty space. */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px dashed var(--color-border);
+  border-right: none;
+  border-bottom: none;
+}
+.work-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 230px;
+  padding: 1.6rem 1.5rem;
+  border-right: 1px dashed var(--color-border);
+  border-bottom: 1px dashed var(--color-border);
+  text-decoration: none;
+  color: var(--color-text);
+  overflow: hidden;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.4);
+  transition: background 0.25s ease;
+}
+.work-card:hover, .work-card:focus-visible {
+  background: rgba(255, 255, 255, 0.65);
+}
+.work-card-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+.work-card-scrim { display: none; }
+.work-card:hover .work-card-image,
+.work-card:focus-visible .work-card-image {
+  opacity: 0.18;
+}
+.work-card-tag {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: var(--color-text-muted);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 2px 6px;
+  display: inline-block;
+  width: fit-content;
+  margin-bottom: 0.6rem;
+}
+.work-card-title {
+  font-family: var(--font-title);
+  font-size: 21px;
+  font-weight: 500;
+  line-height: 1.18;
+  color: var(--color-text);
+  margin: 0 0 0.7rem;
+}
+.work-card-cta {
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.work-card-cta-arrow { transition: transform 0.2s ease; display: inline-block; }
+.work-card:hover .work-card-cta-arrow { transform: translateX(3px); }
+
+body.night-mode .work-grid { border-color: rgba(200, 200, 200, 0.2); }
+body.night-mode .work-card { border-color: rgba(200, 200, 200, 0.2); background: rgba(255, 255, 255, 0.04); color: #f7f5f2; }
+body.night-mode .work-card:hover, body.night-mode .work-card:focus-visible { background: rgba(255, 255, 255, 0.08); }
+body.night-mode .work-card-title { color: #f7f5f2; }
+body.night-mode .work-card-tag { background: rgba(255, 255, 255, 0.06); color: rgba(247, 245, 242, 0.6); }
+body.night-mode .work-card-cta { color: #f0a860; }
+
+@media (max-width: 1024px) {
+  .work-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .work-grid { grid-template-columns: 1fr; }
+  .work-card { min-height: 190px; }
+}
+
+body.night-mode .subpage-title { color: #f7f5f2; }
+body.night-mode .subpage-lede,
+body.night-mode .subpage-eyebrow { color: rgba(247, 245, 242, 0.6); }
+body.night-mode .filter-chip { color: rgba(247, 245, 242, 0.6); border-color: rgba(200, 200, 200, 0.3); }
+body.night-mode .filter-chip.active { background: #f0a860; border-color: #f0a860; color: #1a1a1a; }
+
+/* Project detail page */
+.project-detail-index {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.08em;
+}
+.project-detail-title {
+  font-family: var(--font-title);
+  font-size: clamp(38px, 6vw, 64px);
+  font-weight: 500;
+  line-height: 1.08;
+  color: var(--color-text);
+  margin-bottom: 1.1rem;
+}
+.project-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 2rem;
+}
+.project-tag-accent {
+  color: var(--color-accent);
+  background: rgba(155, 80, 51, 0.1);
+  border: 1px solid rgba(155, 80, 51, 0.35);
+}
+
+.project-detail-hero {
+  width: 100%;
+  overflow: hidden;
+  border: 1.5px dashed var(--color-border);
+  margin-bottom: 2.5rem;
+  background: #1c1812;
+}
+.project-detail-hero-chrome {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 15px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+}
+.project-detail-hero-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
+}
+.project-detail-hero-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  min-height: 220px;
+}
+.project-detail-hero-frame img {
+  max-width: 100%;
+  max-height: min(560px, 62vh);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 5px;
+  box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 0.5);
+}
+
+body.night-mode .project-detail-hero { background: #141210; }
+
+@media (max-width: 600px) {
+  .project-detail-hero-frame { padding: 0.75rem; min-height: 160px; }
+  .project-detail-hero-frame img { max-height: 46vh; }
+}
+
+.project-detail-body {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 3rem;
+}
+.project-detail-description .modal-section-title { margin-bottom: 0.75rem; }
+.project-detail-description .body-text { color: var(--color-text-muted); }
+
+.project-detail-aside {
+  border-left: 1px dashed var(--color-border);
+  padding-left: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  height: fit-content;
+}
+.project-detail-aside-label {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 0.65rem;
+}
+.project-detail-stack-list {
+  list-style: none;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.project-detail-stack-list li { padding-left: 0.9rem; position: relative; }
+.project-detail-stack-list li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+}
+.project-detail-cta { justify-content: center; width: 100%; }
+
+.project-detail-footer-nav {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px dashed var(--color-border);
+}
+
+body.night-mode .project-detail-title { color: #f7f5f2; }
+body.night-mode .project-detail-index { color: rgba(247, 245, 242, 0.5); }
+body.night-mode .project-tag-accent { color: #f0a860; background: rgba(240, 168, 96, 0.12); border-color: rgba(240, 168, 96, 0.4); }
+body.night-mode .project-detail-hero { border-color: rgba(200, 200, 200, 0.2); }
+body.night-mode .project-detail-aside { border-left-color: rgba(200, 200, 200, 0.2); }
+body.night-mode .project-detail-aside-label { color: rgba(247, 245, 242, 0.5); }
+body.night-mode .project-detail-stack-list { color: #f7f5f2; }
+body.night-mode .project-detail-footer-nav { border-top-color: rgba(200, 200, 200, 0.2); }
+
+@media (max-width: 768px) {
+  .project-detail-body { grid-template-columns: 1fr; }
+  .project-detail-aside { border-left: none; padding-left: 0; border-top: 1px dashed var(--color-border); padding-top: 1.5rem; }
+  .subpage-main { padding: 2.5rem 1.25rem 4rem; }
+}
+
+/* =========================================================================
+   Small-phone refinements (≤480px) — the newer /projects and
+   /projects/[slug] pages hadn't had a dedicated small-screen pass yet.
+   ========================================================================= */
+@media (max-width: 600px) {
+  /* Subpage header: back-link + logo must never crowd or overflow */
+  .subpage-header .navbar-inner {
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
+  }
+  .subpage-header .navbar-link {
+    font-size: 11px;
+    padding: 0 10px;
+    min-width: 0;
+    height: 30px;
+    white-space: nowrap;
+  }
+  .subpage-header .navbar-name {
+    font-size: 15px;
+    white-space: nowrap;
+  }
+
+  .subpage-main { padding: 2rem 1rem 3rem; }
+  .subpage-eyebrow { font-size: 10px; }
+  .subpage-lede { font-size: 13.5px; }
+  .subpage-empty { padding: 2rem 0; }
+
+  /* Filter chips: tighter, still wrap freely */
+  .filter-chip-row { gap: 0.4rem; margin-bottom: 1.75rem; }
+  .filter-chip { font-size: 11px; padding: 6px 12px; }
+
+  /* All Work cards */
+  .work-grid { border-left: none; border-right: none; }
+  .work-card { min-height: 160px; padding: 1.1rem 1.1rem 1rem; }
+  .work-card-title { font-size: 18px; }
+  .work-card-tag { font-size: 9px; padding: 2px 5px; }
+  .work-card-cta { font-size: 10px; }
+
+  /* Project detail page */
+  .project-detail-title { font-size: clamp(30px, 9vw, 40px); margin-bottom: 0.85rem; }
+  .project-detail-index { font-size: 11px; margin-bottom: 0.5rem; }
+  .project-detail-tags { gap: 0.3rem; margin-bottom: 1.5rem; }
+  .project-detail-hero { margin-bottom: 1.75rem; }
+  .project-detail-body { gap: 2rem; }
+  .project-detail-aside { padding-top: 1.25rem; gap: 1.25rem; }
+  .project-detail-aside-label { font-size: 10px; }
+  .project-detail-stack-list { font-size: 13px; }
+  .project-detail-footer-nav { margin-top: 2.5rem; padding-top: 1.25rem; }
+
+  /* Homepage featured project row, in case it's viewed this narrow */
+  .featured-project-name { font-size: 19px; }
+  .featured-project-summary { font-size: 12.5px; }
+  .all-work-link { font-size: 11px; padding: 7px 12px; }
+  .projects-heading-row { gap: 0.5rem; }
+}
+
+@media (max-width: 360px) {
+  .subpage-header .navbar-inner { flex-wrap: wrap; row-gap: 0.4rem; }
+  .subpage-header .navbar-link { font-size: 10px; padding: 0 8px; height: 28px; }
+  .subpage-header .navbar-name { font-size: 14px; }
+  .work-card { min-height: 145px; }
 }

@@ -106,6 +106,19 @@ export default function Home() {
   // SSR-safe greeting
   useEffect(() => { setGreeting(getGreeting()); }, []);
 
+  // Keep the URL hash in sync with whichever section is actually in view.
+  // Without this, following a link like "/#projects" leaves "#projects"
+  // stuck in the address bar even after the user scrolls elsewhere.
+  useEffect(() => {
+    const current = window.location.pathname + window.location.search + window.location.hash;
+    const next = activeSection
+      ? `${window.location.pathname}${window.location.search}#${activeSection}`
+      : `${window.location.pathname}${window.location.search}`;
+    if (current !== next) {
+      window.history.replaceState(null, "", next);
+    }
+  }, [activeSection]);
+
   const scrollTo = useCallback((id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
