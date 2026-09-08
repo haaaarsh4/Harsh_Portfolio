@@ -990,8 +990,8 @@ body.custom-cursor-on, body.custom-cursor-on * { cursor: none !important; }
 .project-grid-wrap { position: relative; }
 .projects-dino {
   position: absolute;
-  left: 0.25rem;
-  right: auto;
+  right: 0.25rem;
+  left: auto;
   bottom: -9rem;
   top: auto;
   width: clamp(280px, 28vw, 440px);
