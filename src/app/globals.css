@@ -1147,7 +1147,16 @@ body.custom-cursor-on, body.custom-cursor-on * { cursor: none !important; }
 .drawer-body::-webkit-scrollbar-track { background: transparent; }
 .drawer-body::-webkit-scrollbar-thumb { background: var(--color-border); }
 
-.modal-image { width: calc(100% + 3rem); margin-left: -1.5rem; aspect-ratio: 16 / 6; object-fit: cover; display: block; margin-bottom: 1.25rem; border-bottom: 1px dashed var(--color-border); }
+.modal-image {
+  width: calc(100% + 3rem);
+  margin-left: -1.5rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center 30%;
+  display: block;
+  margin-bottom: 1.25rem;
+  border-bottom: 1px dashed var(--color-border);
+}
 .modal-image.modal-image-cooking { aspect-ratio: 16 / 9; }
 .modal-image.pending { opacity: 0; }
 .modal-image.ready { opacity: 1; }
@@ -1955,6 +1964,7 @@ body.night-mode .subpage-decor-tiger {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 25%;
   opacity: 0;
   transition: opacity 0.22s ease;
   pointer-events: none;
