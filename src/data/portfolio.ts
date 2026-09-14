@@ -133,6 +133,87 @@ export const research: ResearchItem[] = [
 ];
 
 export const projects: ProjectItem[] = [
+    {
+    slug: "archer-robot-vocal-collaboration",
+    title: "Archer Vocal Collaboration System",
+    award: "AI · Real-Time Audio",
+    category: "Machine Learning",
+    summary: "A real-time vocal collaboration system that listens to a singer and generates responsive harmonies.",
+    description: "A real-time AI and audio system that listens to a singer and generates musical responses through a live pitch, rhythm, harmony, and vocal synthesis pipeline. Audio is captured from a microphone and processed through pitch detection using YIN or RMVPE, rhythm and phrase analysis, and a harmony engine that selects responses such as unison, thirds, fifths, octaves, drones, and call-and-response patterns. A DSP-based vocable synthesizer then renders the response using sinusoidal, wavetable, or formant synthesis, with an optional RVC neural voice conversion stage for neural singing voice rendering. The project also includes a FastAPI research web application with Cree morphological analysis, a custom Cree-to-English translation model, RoBERTa sentiment analysis with a VADER fallback, offline transcription using faster-whisper, live streaming captions using Vosk, pitch analysis, and a notes-grounded chat assistant. The neural voice conversion system is isolated in a separate FastAPI sidecar so the heavier PyTorch and RVC stack does not block the real-time audio pipeline.",
+    stack: "Python · FastAPI · PyTorch · RVC · RMVPE · YIN · faster-whisper · Vosk",
+    tags: [
+      "Python",
+      "FastAPI",
+      "Real-Time Audio",
+      "Pitch & Rhythm Analysis",
+      "DSP Audio Synthesis",
+      "PyTorch",
+      "RVC Voice Conversion",
+      "faster-whisper",
+      "Vosk",
+      "Cree NLP"
+    ],
+    image: "/ArcherBot.jpg",
+    link: "https://github.com/haaaarsh4/Archer-Robot-Vocal-Collaboration-System",
+    linkLabel: "View Code",
+    featured: true,
+    modal: {
+      title: "Archer Vocal Collaboration System",
+      subtitle: "AI · Real-Time Audio",
+      image: "/AVCS.png",
+      body: "A real-time vocal collaboration system that listens to a singer and generates responsive musical harmonies. The live pipeline combines microphone capture, pitch detection using YIN or RMVPE, rhythm and phrase analysis, a configurable harmony engine, and DSP-based vocable synthesis. An optional RVC sidecar provides neural singing voice conversion without blocking the real-time audio loop.<br /><br />The project also includes a FastAPI research application with Cree morphological analysis, a custom Cree-to-English translation model, sentiment analysis, offline transcription with faster-whisper, live captions with Vosk, pitch analysis, neural voice rendering, and a notes-grounded chat assistant. The system is designed so individual model-dependent features can fail safely while the rest of the application continues running.",
+      links: [
+        {
+          label: "Documentation",
+          url: "https://archer-robot-vocal-collaboration-system.onrender.com/"
+        },
+        {
+          label: "View Code",
+          url: "https://github.com/haaaarsh4/Archer-Robot-Vocal-Collaboration-System"
+        }
+      ],
+    },
+  },
+  {
+    slug: "palimpsest",
+    title: "Palimpsest",
+    award: "Full-Stack · Web Archive",
+    category: "Web Development",
+    summary: "A web application for tracing how websites change across archived snapshots.",
+    description: "A full-stack web application that lets users explore how websites have changed over time using snapshots from the Internet Archive's Wayback Machine. The application retrieves a URL's snapshot history through the Wayback CDX API, collapses consecutive snapshots with identical content, and presents the remaining changes through an interactive timeline. Instead of performing a raw text diff, the backend parses archived pages into DOM trees and compares structured content blocks such as headings, paragraphs, links, images, and list items to identify additions, removals, and edits. Archived pages are rendered inside sandboxed iframes with scripts removed to prevent archived JavaScript and styling from affecting the application. Palimpsest also stores notes and cached snapshots in SQLite and includes an optional Claude-powered Insight panel that uses web search to research the real-world context surrounding a change.",
+    stack: "Node.js · Express · JavaScript · SQLite · Wayback Machine · Anthropic API",
+    tags: [
+      "Node.js",
+      "Express",
+      "JavaScript",
+      "SQLite",
+      "Wayback Machine CDX API",
+      "DOM Parsing",
+      "Diff Algorithms",
+      "Claude API",
+      "Web Archiving"
+    ],
+    image: "/archive.jpg",
+    link: "https://palimpsest-fj3g.onrender.com/",
+    linkLabel: "Live Demo",
+    featured: true,
+    modal: {
+      title: "Palimpsest",
+      subtitle: "Full-Stack · Web Archive",
+      image: "/Palimpsest.png",
+      body: "A full-stack web application for tracing how websites change over time using archived snapshots from the Internet Archive's Wayback Machine. The application retrieves snapshot histories through the CDX API and presents only meaningful changes on an interactive timeline.<br /><br />Rather than using a raw text diff, the backend parses archived pages into DOM trees and compares structured content blocks such as headings, paragraphs, links, images, and list items. Archived pages are rendered in sandboxed iframes with scripts removed, while SQLite stores notes and cached snapshots. An optional Claude-powered Insight panel can research the context surrounding a detected change using live web search.",
+      links: [
+        {
+          label: "Live Demo",
+          url: "https://palimpsest-fj3g.onrender.com/"
+        },
+        {
+          label: "View Code",
+          url: "https://github.com/haaaarsh4/Palimpsest"
+        }
+      ],
+    },
+  },
   {
     slug: "workout-tracker",
     title: "Workout Tracker",
