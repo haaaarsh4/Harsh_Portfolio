@@ -2147,7 +2147,9 @@ body.night-mode .project-detail-hero { background: #141210; }
   gap: 3rem;
 }
 .project-detail-description .modal-section-title { margin-bottom: 0.75rem; }
-.project-detail-description .body-text { color: var(--color-text-muted); }
+.project-detail-description .body-text { color: var(--color-text-muted); margin: 0 0 1.15em; }
+.project-detail-description .body-text:last-child { margin-bottom: 0; }
+.project-detail-description .body-text a { color: var(--color-text); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 
 .project-detail-aside {
   border-left: 1px dashed var(--color-border);

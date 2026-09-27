@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { projects, getProjectBySlug } from "@/data/portfolio";
+import { splitRichText } from "@/lib/richText";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -28,6 +29,11 @@ export default async function ProjectDetailPage({ params }: Props) {
 
   const index = projects.findIndex((p) => p.slug === project.slug) + 1;
   const isCode = project.linkLabel.toLowerCase().includes("code");
+
+  // `modal.body` is the long-form copy and may contain light HTML markup such
+  // as <br />, so it is split into paragraphs and rendered as HTML. Fall back
+  // to the plain `description` if a project has no modal body.
+  const paragraphs = splitRichText(project.modal?.body || project.description);
 
   return (
     <div className="subpage-shell">
@@ -67,7 +73,14 @@ export default async function ProjectDetailPage({ params }: Props) {
         <div className="project-detail-body">
           <div className="project-detail-description">
             <h2 className="modal-section-title">About this project</h2>
-            <p className="body-text">{project.description}</p>
+
+            {paragraphs.map((paragraph, paragraphIndex) => (
+              <p
+                className="body-text"
+                key={paragraphIndex}
+                dangerouslySetInnerHTML={{ __html: paragraph }}
+              />
+            ))}
           </div>
 
           <aside className="project-detail-aside">
