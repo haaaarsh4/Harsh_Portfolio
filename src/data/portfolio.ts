@@ -26,13 +26,9 @@ export interface ResearchItem {
 export interface ProjectItem {
   slug: string;
   title: string;
-  /** Short line shown as the pill/tag on cards, e.g. "Full-Stack · Production" */
   award: string;
-  /** Broader grouping used by the All Work filter chips */
   category: string;
-  /** One-line summary used on compact cards */
   summary: string;
-  /** Full write-up shown on the project's own page */
   description: string;
   stack: string;
   tags: string[];
@@ -54,11 +50,11 @@ export const siteConfig = {
   resumePdf: "/Harsh_Upadhyay_Resume.pdf",
   about: {
     paragraphs: [
-    "My journey has taken me across different places, cultures, and experiences that have shaped the way I see the world today. I was born in Rajasthan, India, and later moved to the United Arab Emirates, where I spent my childhood and completed my schooling. Growing up in different environments gave me the chance to experience different perspectives from an early age, and taught me to stay curious, embrace change, and always remain open to learning from the world around me.",
-    "<br /> Moving to Canada brought me to McMaster University, where I am now completing my undergraduate degree in Computer Science. During my time here, I have discovered a deep passion for research, artificial intelligence, and the process of turning curiosity into something meaningful. Through academic work at McMaster University and OCAD University, I have had the opportunity to explore areas such as AI, machine learning, and language, experiences that have made me want to continue learning and eventually pursue graduate studies.",
-    "<br /> Alongside academia, my two roles with the Government of Ontario have given me the opportunity to see technology from a different perspective and understand what it means to build solutions that people can actually rely on. Across everything I do, I find myself coming back to the same things that have always mattered to me: staying curious, learning something new, building things I care about, and using technology to create something that can genuinely help people."    ],
+    "I have always been drawn to questions. Not because I have always known the answers, but because I love the feeling of discovering something I did not understand before. When I came to McMaster to study Computer Science, I thought I was simply choosing a field I enjoyed. Somewhere along the way, however, programming became much more than that. It became a way to turn ideas into something real, and a way to keep following my curiosity wherever it led me.",
+    "<br /> That curiosity has taken me through research at McMaster and OCAD University, where I have explored artificial intelligence, machine learning, and language, as well as through my work with the Government of Ontario, where I saw how deeply technology can affect the people who rely on it. Each experience has given me a different way of looking at the world, but they have all left me with the same feeling: there is always something more to learn, something new to build, and another question worth asking.",
+    "<br /> I think that is what I value most. I love learning, I love building, and I love the moments when an idea that once existed only in my head becomes something real. I am still discovering where that curiosity will take me, but I feel incredibly fortunate that I get to keep following it, one question and one idea at a time."    ],
     quote: { label: "April 2026", text: "Keep shipping. Keep learning." },
-    polaroidSrc: "/CN Tower.jpeg",
+    polaroidSrc: "/CN Tower1.jpeg",
     polaroidCaption: "Toronto, Ontario · 2024",
   },
 };
