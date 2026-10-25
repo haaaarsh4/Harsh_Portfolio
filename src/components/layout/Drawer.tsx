@@ -1,9 +1,11 @@
 "use client";
+import Link from "next/link";
 import type { ExperienceModal } from "@/data/portfolio";
 
 interface Props {
   activeModal: ExperienceModal | null;
   modalSection: string;
+  modalDetailHref?: string | null;
   closeModal: () => void;
   drawerCloseRef: React.RefObject<HTMLButtonElement | null>;
   drawerImageReady: boolean;
@@ -13,6 +15,7 @@ interface Props {
 export default function Drawer({
   activeModal,
   modalSection,
+  modalDetailHref,
   closeModal,
   drawerCloseRef,
   drawerImageReady,
@@ -34,14 +37,30 @@ export default function Drawer({
         <div className="drawer-frame" aria-hidden="true" />
         <div className="drawer-header">
           <span className="drawer-tab">{modalSection}</span>
-          <button
-            ref={drawerCloseRef}
-            className="modal-close"
-            onClick={closeModal}
-            aria-label="Close drawer"
-          >
-            ✕
-          </button>
+          <div className="drawer-header-actions">
+            {/* Client-side navigation: a plain anchor here forced a full document
+                reload, so the drawer vanished, the screen went blank while the
+                new document downloaded, and the story page then popped in. The
+                story route is prefetched, so this now swaps in one frame and
+                fades in. The drawer unmounts with the page, and useModal clears
+                the scroll lock on unmount. */}
+            {modalDetailHref && (
+              <Link href={modalDetailHref} className="drawer-read-more">
+                Read more
+                <span className="drawer-read-more-arrow" aria-hidden="true">
+                  ↗
+                </span>
+              </Link>
+            )}
+            <button
+              ref={drawerCloseRef}
+              className="modal-close"
+              onClick={closeModal}
+              aria-label="Close drawer"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {activeModal && (

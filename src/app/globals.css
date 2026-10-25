@@ -49,7 +49,10 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  scroll-behavior: smooth;
+  /* Deliberately not `smooth`: every in-page scroll in this site asks for
+     smoothness explicitly in JavaScript. Leaving it on here made the router's
+     scroll-to-top animate through the whole document on every navigation,
+     which is what made arriving at a sub-page feel broken. */
   scroll-padding-top: 80px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -407,10 +410,10 @@ body.night-mode::-webkit-scrollbar-thumb:hover {
   color: var(--color-text); margin-bottom: 1.5rem;
 }
 
-html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+html { -webkit-overflow-scrolling: touch; }
 
 /* ═══════════════════════════════════════
-   SCROLL RUNWAY — uses overflow: clip
+   SCROLL RUNWAY: uses overflow: clip
    overflow: hidden creates a scroll container (the browser
    implicitly sets overflow-y: auto per CSS spec). This was
    the cause of the nested scroll in the projects section.
@@ -1170,6 +1173,23 @@ body.custom-cursor-on, body.custom-cursor-on * { cursor: none !important; }
 .drawer-frame { position: absolute; top: 8px; left: 8px; bottom: 8px; right: 0; border-top: 1px dotted var(--color-border); border-left: 1px dotted var(--color-border); pointer-events: none; z-index: 0; opacity: 0.45; }
 .drawer-header { position: relative; z-index: 2; height: var(--navbar-height); padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; border-bottom: 1px solid rgba(196, 192, 185, 0.55); }
 .drawer-tab { font-family: var(--font-body); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-muted); opacity: 0.55; user-select: none; }
+.drawer-header-actions { display: flex; align-items: center; gap: 0.5rem; }
+.drawer-read-more {
+  font-family: var(--font-body); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; text-decoration: none; color: var(--color-text);
+  padding: 7px 12px; display: inline-flex; align-items: center; gap: 0.35rem;
+  border: 1px solid rgba(155, 80, 51, 0.42); background: transparent;
+  white-space: nowrap; transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.drawer-read-more:hover, .drawer-read-more:focus-visible {
+  background: var(--color-accent); border-color: var(--color-accent); color: var(--color-bg); opacity: 1;
+}
+.drawer-read-more-arrow { display: inline-block; transition: transform 0.2s ease; }
+.drawer-read-more:hover .drawer-read-more-arrow { transform: translate(1px, -1px); }
+@media (max-width: 420px) {
+  .drawer-header .drawer-tab { display: none; }
+  .drawer-header { justify-content: flex-end; }
+}
 .modal-close { background: transparent; border: 1px dashed var(--color-border); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; color: var(--color-text-muted); transition: all 0.2s ease; font-family: var(--font-body); z-index: 2; flex-shrink: 0; line-height: 1; }
 .modal-close:hover, .modal-close:focus-visible { color: var(--color-text); border-style: solid; border-color: var(--color-text); }
 
@@ -1185,17 +1205,21 @@ body.custom-cursor-on, body.custom-cursor-on * { cursor: none !important; }
 .drawer-body::-webkit-scrollbar-track { background: transparent; }
 .drawer-body::-webkit-scrollbar-thumb { background: var(--color-border); }
 
+/* Full-bleed panel image. It keeps each screenshot's own aspect ratio instead of
+   being forced into 16:9, which used to crop the sides of wide app captures.
+   max-height + contain keeps unusually tall images from taking over the panel. */
 .modal-image {
   width: calc(100% + 3rem);
   margin-left: -1.5rem;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  object-position: center 30%;
+  height: auto;
+  max-height: 68vh;
+  object-fit: contain;
+  object-position: center;
+  background: rgba(201, 138, 52, 0.06);
   display: block;
   margin-bottom: 1.25rem;
   border-bottom: 1px dashed var(--color-border);
 }
-.modal-image.modal-image-cooking { aspect-ratio: 16 / 9; }
 .modal-image.pending { opacity: 0; }
 .modal-image.ready { opacity: 1; }
 .modal-image {
@@ -1716,7 +1740,7 @@ body.night-mode *:focus-visible { outline-color: #f0a860; }
 }
 
 /* =========================================================================
-   Featured Projects (home page) — top 4 projects, one row, big photo-top
+   Featured Projects (home page): top 4 projects, one row, big photo-top
    card with a short description at the bottom. Also the "All work" link
    next to the section heading.
    ========================================================================= */
@@ -1843,7 +1867,7 @@ body.night-mode .featured-project-cta { color: #f0a860; }
   .featured-project-card:last-child { border-bottom: none; }
 }
 /* =========================================================================
-   Subpages — /projects (All Work) and /projects/[slug] (project detail)
+   Subpages: /projects (All Work) and /projects/[slug] (project detail)
    ========================================================================= */
 
 .subpage-shell {
@@ -1852,6 +1876,14 @@ body.night-mode .featured-project-cta { color: #f0a860; }
   max-width: 100vw;
   position: relative;
   overflow: hidden;
+  /* Every sub-page arrives on a single, quiet fade, with no movement, no stagger,
+     no per-element effects. It simply removes the hard cut between routes. */
+  animation: subpageIn 260ms ease-out both;
+}
+
+@keyframes subpageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .subpage-decor-tiger {
@@ -1968,7 +2000,7 @@ body.night-mode .subpage-decor-tiger {
   border-style: solid;
 }
 
-/* All Work page — compact grid, photo reveals as a full-card background on
+/* All Work page: compact grid, photo reveals as a full-card background on
    hover with a dark scrim for legibility, no reserved empty space. */
 .work-grid {
   display: grid;
@@ -2068,13 +2100,6 @@ body.night-mode .filter-chip { color: rgba(247, 245, 242, 0.6); border-color: rg
 body.night-mode .filter-chip.active { background: #f0a860; border-color: #f0a860; color: #1a1a1a; }
 
 /* Project detail page */
-.project-detail-index {
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--color-text-muted);
-  margin-bottom: 0.75rem;
-  letter-spacing: 0.08em;
-}
 .project-detail-title {
   font-family: var(--font-title);
   font-size: clamp(38px, 6vw, 64px);
@@ -2095,50 +2120,106 @@ body.night-mode .filter-chip.active { background: #f0a860; border-color: #f0a860
   border: 1px solid rgba(155, 80, 51, 0.35);
 }
 
-.project-detail-hero {
-  width: 100%;
+/* Project hero as a macOS window. The screenshot fills the window edge to edge
+   (no dark letterboxing); the chrome above it carries the traffic lights, the
+   address and a way out to the live site. */
+.project-window {
+  margin: 0 0 clamp(2.25rem, 4vw, 3rem);
+  border-radius: 12px;
   overflow: hidden;
-  border: 1.5px dashed var(--color-border);
-  margin-bottom: 2.5rem;
-  background: #1c1812;
+  border: 1px solid rgba(55, 46, 40, 0.22);
+  background: #ece2d3;
 }
-.project-detail-hero-chrome {
+.project-window-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 0.75rem;
+  height: 42px;
+  padding: 0 12px 0 14px;
+  background: linear-gradient(180deg, #f4ebdd 0%, #e9dfcf 100%);
+  border-bottom: 1px solid rgba(55, 46, 40, 0.16);
+}
+.project-window-lights {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 11px 15px;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  gap: 8px;
 }
-.project-detail-hero-dot {
-  width: 9px;
-  height: 9px;
+.project-window-light {
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16);
+  display: block;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.14);
 }
-.project-detail-hero-frame {
-  display: flex;
+.project-window-light-close { background: #ff5f57; }
+.project-window-light-min { background: #febc2e; }
+.project-window-light-max { background: #28c840; }
+.project-window-title {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.01em;
+  color: rgba(55, 46, 40, 0.66);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: min(66ch, 100%);
+}
+.project-window-open {
+  justify-self: end;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 4vw, 2.5rem);
-  min-height: 220px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1;
+  color: rgba(55, 46, 40, 0.6);
+  text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease;
 }
-.project-detail-hero-frame img {
-  max-width: 100%;
-  max-height: min(560px, 62vh);
-  width: auto;
-  height: auto;
-  object-fit: contain;
+.project-window-open:hover,
+.project-window-open:focus-visible {
+  background: rgba(55, 46, 40, 0.09);
+  color: var(--color-text);
+  opacity: 1;
+}
+.project-window-screen {
+  line-height: 0;
+  background: #e4dacb;
+}
+.project-window-screen img {
   display: block;
-  border-radius: 5px;
-  box-shadow: 0 20px 44px -20px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: auto;
 }
 
-body.night-mode .project-detail-hero { background: #141210; }
+body.night-mode .project-window {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: #201d1a;
+}
+body.night-mode .project-window-bar {
+  background: linear-gradient(180deg, #34302c 0%, #2a2622 100%);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+body.night-mode .project-window-title { color: rgba(247, 245, 242, 0.62); }
+body.night-mode .project-window-open { color: rgba(247, 245, 242, 0.6); }
+body.night-mode .project-window-open:hover,
+body.night-mode .project-window-open:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f7f5f2;
+}
+body.night-mode .project-window-screen { background: #141210; }
 
 @media (max-width: 600px) {
-  .project-detail-hero-frame { padding: 0.75rem; min-height: 160px; }
-  .project-detail-hero-frame img { max-height: 46vh; }
+  .project-window { border-radius: 10px; }
+  .project-window-bar { height: 36px; gap: 0.5rem; padding: 0 10px 0 12px; }
+  .project-window-lights { gap: 6px; }
+  .project-window-light { width: 9px; height: 9px; }
+  .project-window-title { font-size: 10px; max-width: 30ch; }
 }
 
 .project-detail-body {
@@ -2192,9 +2273,7 @@ body.night-mode .project-detail-hero { background: #141210; }
 }
 
 body.night-mode .project-detail-title { color: #f7f5f2; }
-body.night-mode .project-detail-index { color: rgba(247, 245, 242, 0.5); }
 body.night-mode .project-tag-accent { color: #f0a860; background: rgba(240, 168, 96, 0.12); border-color: rgba(240, 168, 96, 0.4); }
-body.night-mode .project-detail-hero { border-color: rgba(200, 200, 200, 0.2); }
 body.night-mode .project-detail-aside { border-left-color: rgba(200, 200, 200, 0.2); }
 body.night-mode .project-detail-aside-label { color: rgba(247, 245, 242, 0.5); }
 body.night-mode .project-detail-stack-list { color: #f7f5f2; }
@@ -2207,7 +2286,7 @@ body.night-mode .project-detail-footer-nav { border-top-color: rgba(200, 200, 20
 }
 
 /* =========================================================================
-   Small-phone refinements (≤480px) — the newer /projects and
+   Small-phone refinements (≤480px): the newer /projects and
    /projects/[slug] pages hadn't had a dedicated small-screen pass yet.
    ========================================================================= */
 @media (max-width: 600px) {
@@ -2246,9 +2325,8 @@ body.night-mode .project-detail-footer-nav { border-top-color: rgba(200, 200, 20
 
   /* Project detail page */
   .project-detail-title { font-size: clamp(30px, 9vw, 40px); margin-bottom: 0.85rem; }
-  .project-detail-index { font-size: 11px; margin-bottom: 0.5rem; }
   .project-detail-tags { gap: 0.3rem; margin-bottom: 1.5rem; }
-  .project-detail-hero { margin-bottom: 1.75rem; }
+  .project-window { margin-bottom: 1.75rem; }
   .project-detail-body { gap: 2rem; }
   .project-detail-aside { padding-top: 1.25rem; gap: 1.25rem; }
   .project-detail-aside-label { font-size: 10px; }
@@ -2268,3 +2346,371 @@ body.night-mode .project-detail-footer-nav { border-top-color: rgba(200, 200, 20
   .subpage-header .navbar-name { font-size: 14px; }
   .work-card { min-height: 145px; }
 }
+
+/* =========================================================================
+   Story pages: /experience/[slug] and /research/[slug]
+   Editorial layout: a huge centred title, a hairline rule, a two-column
+   intro, a staggered photo strip, then the long-form story. The grid matches
+   .subpage-main so story and project pages line up with each other.
+   ========================================================================= */
+
+.story-shell { overflow: hidden; }
+
+.story-main {
+  max-width: var(--max-width);
+  padding: clamp(2.8rem, 5.5vw, 4.6rem) 1.5rem clamp(4.5rem, 8vw, 7rem);
+}
+
+/* --- Hero --- */
+.story-title {
+  font-family: var(--font-title);
+  font-weight: 500;
+  font-size: clamp(44px, 9.2vw, 118px);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-text);
+  margin: 0 auto;
+  max-width: 16ch;
+}
+.story-hero-role {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  text-align: center;
+  /* Cancels the trailing letter-space so the tracked line sits optically centred. */
+  text-indent: 0.2em;
+  margin-top: clamp(1rem, 2.2vw, 1.65rem);
+}
+.story-rule {
+  border: 0;
+  border-top: 1px solid rgba(122, 100, 82, 0.5);
+  margin: clamp(1.65rem, 3.4vw, 2.6rem) 0 0;
+}
+
+/* --- Two-column intro --- */
+.story-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(1.75rem, 6vw, 6rem);
+  align-items: start;
+  padding: clamp(2rem, 4.4vw, 3.4rem) 0 clamp(2.2rem, 4vw, 3rem);
+}
+.story-statement {
+  font-family: var(--font-title);
+  font-size: clamp(22px, 2.5vw, 31px);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--color-text);
+  max-width: 24ch;
+}
+.story-intro-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.4rem;
+}
+.story-lede {
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.45vw, 18px);
+  line-height: 1.65;
+  color: var(--color-text);
+  max-width: 54ch;
+}
+/* --- Photographs: one row of the photographs themselves, nothing cut out,
+   cropped or recoloured. The photos hang from a shared top edge and each one
+   is a different length, so the row ends on a ragged line the way a contact
+   sheet does rather than on five identical tiles. --- */
+.story-gallery { padding-bottom: clamp(2.75rem, 5.5vw, 4.25rem); }
+.story-gallery-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: clamp(1.1rem, 2vw, 1.55rem);
+}
+.story-gallery-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0;
+  white-space: nowrap;
+}
+.story-gallery-rule {
+  flex: 1;
+  height: 1px;
+  background: rgba(201, 190, 178, 0.85);
+}
+.story-gallery-strip {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(8px, 1.3vw, 17px);
+}
+.story-photo {
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 0;
+  line-height: 0;
+}
+.story-photo-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  /* Paper-toned placeholder so a slow image fades in against the page rather
+     than flashing white. */
+  background: rgba(163, 91, 60, 0.07);
+}
+
+/* --- Story body + facts --- */
+.story-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  padding-top: clamp(2.4rem, 5vw, 4rem);
+  border-top: 1px dashed var(--color-border);
+}
+.story-prose { max-width: 64ch; }
+.story-section-title {
+  font-family: var(--font-title);
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+.story-paragraph {
+  font-family: var(--font-body);
+  font-size: clamp(15px, 1.15vw, 16.5px);
+  line-height: 1.82;
+  color: var(--color-text);
+  margin: 0 0 1.35em;
+}
+.story-paragraph a {
+  color: var(--color-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.story-highlights {
+  margin-top: clamp(2.2rem, 4vw, 3.2rem);
+  padding-top: clamp(1.6rem, 3vw, 2.2rem);
+  border-top: 1px dashed var(--color-border);
+}
+.story-highlight-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  counter-reset: highlight;
+}
+.story-highlight-list li {
+  position: relative;
+  counter-increment: highlight;
+  padding: 0.9rem 0 0.9rem 2.3rem;
+  border-bottom: 1px dashed rgba(201, 190, 178, 0.7);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+.story-highlight-list li:last-child { border-bottom: none; }
+.story-highlight-list li::before {
+  content: counter(highlight, decimal-leading-zero);
+  position: absolute;
+  left: 0.15rem;
+  top: 1.02rem;
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+}
+
+.story-aside {
+  border-left: 1px dashed var(--color-border);
+  padding-left: clamp(1.25rem, 2.4vw, 1.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  height: fit-content;
+  position: sticky;
+  top: 96px;
+}
+.story-aside-label {
+  font-family: var(--font-body);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  opacity: 0.75;
+  margin-bottom: 0.3rem;
+}
+.story-aside-value {
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--color-text);
+}
+.story-aside-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--color-border);
+}
+.story-aside-links .modal-link { justify-content: center; }
+
+/* --- Previous / next --- */
+.story-nav {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(122, 100, 82, 0.35);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.story-nav-back {
+  font-family: var(--font-body);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0;
+}
+.story-nav-back:hover { color: var(--color-accent); opacity: 1; }
+.story-nav-pager {
+  display: flex;
+  gap: clamp(0.9rem, 2.5vw, 1.75rem);
+  margin-left: auto;
+}
+.story-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-decoration: none;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-left: 1px dashed var(--color-border);
+  max-width: 220px;
+}
+.story-nav-link-next {
+  text-align: right;
+  padding: 0.35rem 1rem 0.35rem 0;
+  border-left: none;
+  border-right: 1px dashed var(--color-border);
+}
+.story-nav-direction {
+  font-family: var(--font-body);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+.story-nav-role {
+  font-family: var(--font-title);
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--color-text);
+  transition: color 0.2s ease;
+}
+.story-nav-org {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.story-nav-link:hover { opacity: 1; }
+.story-nav-link:hover .story-nav-role { color: var(--color-accent); }
+
+@media (max-width: 900px) {
+  .story-title { font-size: clamp(40px, 10.5vw, 74px); max-width: 14ch; }
+  .story-intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+    padding-bottom: 2rem;
+  }
+  .story-statement { max-width: 30ch; }
+
+  .story-body { grid-template-columns: minmax(0, 1fr); gap: 2.25rem; }
+  .story-prose { max-width: none; }
+  .story-aside {
+    position: static;
+    height: auto;
+    border-left: none;
+    border-top: 1px dashed var(--color-border);
+    padding-left: 0;
+    padding-top: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 1.4rem 2.5rem;
+  }
+  .story-aside-links {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-top: none;
+    padding-top: 0;
+  }
+  .story-aside-links .modal-link { justify-content: flex-start; }
+
+  /* Below the desktop breakpoint the strip stops squeezing five photos into
+     thumbnails: it keeps a real height and is swiped sideways instead,
+     bleeding to the page edge so the row reads as continuing off-screen. */
+  .story-gallery-strip {
+    --strip-pad: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-right: calc(-1 * var(--strip-pad));
+    padding-right: var(--strip-pad);
+  }
+  .story-gallery-strip::-webkit-scrollbar { display: none; }
+  .story-photo {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+  /* Same rhythm as the desktop row, expressed as heights so the photos keep
+     their own widths as the strip is swiped. */
+  .story-photo-img { width: auto; height: calc(190px * var(--rhythm, 1)); }
+
+  /* Below the desktop breakpoint the pager becomes a stacked list of rows,
+     so a single Previous/Next entry never floats beside an empty column. */
+  .story-nav { flex-direction: column; align-items: stretch; gap: 1.25rem; }
+  .story-nav-pager { margin-left: 0; flex-direction: column; gap: 0; }
+  .story-nav-link, .story-nav-link-next {
+    max-width: none;
+    flex: 1 1 auto;
+    text-align: left;
+    padding: 0.9rem 0;
+    border-left: none;
+    border-right: none;
+    border-top: 1px dashed var(--color-border);
+  }
+}
+
+@media (max-width: 600px) {
+  .story-main { padding: 2rem 1rem 3.5rem; }
+  .story-title { font-size: clamp(34px, 11vw, 52px); line-height: 1; }
+  .story-hero-role { font-size: 9.5px; letter-spacing: 0.16em; }
+  .story-intro { padding-top: 1.75rem; }
+  .story-statement { font-size: 21px; }
+  .story-lede { font-size: 14.5px; }
+  .story-gallery-strip { --strip-pad: 1rem; }
+  .story-photo-img { height: calc(166px * var(--rhythm, 1)); }
+  .story-paragraph { font-size: 14.5px; line-height: 1.8; }
+  .story-highlight-list li { font-size: 13.5px; padding-left: 2rem; }
+  .story-nav-role { font-size: 14.5px; }
+  .story-nav-org { font-size: 10.5px; }
+
+  .story-aside { grid-template-columns: minmax(0, 1fr); gap: 1.15rem; }
+}
+

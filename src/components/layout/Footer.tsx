@@ -47,6 +47,7 @@ export default function Footer({ nightMode = false }: Props) {
               src="/toronto-skyline.png"
               className="city-skyline"
               nightMode={nightMode}
+              maxSize={1600}
             />
           </div>
         </footer>

@@ -9,7 +9,12 @@ interface Props {
   onProgress: (p: number) => void;
   revealed: boolean;
   nightMode?: boolean;
-  onCardClick: (modal: ExperienceModal, section: string, trigger: HTMLElement) => void;
+  onCardClick: (
+    modal: ExperienceModal,
+    section: string,
+    trigger: HTMLElement,
+    detailHref?: string
+  ) => void;
   showCursor?: (text: string) => void;
   hideCursor?: () => void;
 }
@@ -57,11 +62,18 @@ export default function Projects({ onProgress, revealed, nightMode = false, onCa
                       role="listitem"
                       tabIndex={0}
                       style={{ animationDelay: `${i * 60}ms` }}
-                      onClick={(e) => onCardClick(proj.modal, "projects", e.currentTarget)}
+                      onClick={(e) =>
+                        onCardClick(proj.modal, "projects", e.currentTarget, `/projects/${proj.slug}?from=home`)
+                      }
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          onCardClick(proj.modal, "projects", e.currentTarget);
+                          onCardClick(
+                            proj.modal,
+                            "projects",
+                            e.currentTarget,
+                            `/projects/${proj.slug}?from=home`
+                          );
                         }
                       }}
                       onMouseEnter={() => showCursor?.("View project")}

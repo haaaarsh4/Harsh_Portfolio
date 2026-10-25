@@ -6,6 +6,7 @@ import { splitRichText } from "@/lib/richText";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ from?: string }>;
 }
 
 export function generateStaticParams() {
@@ -22,13 +23,38 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ProjectDetailPage({ params }: Props) {
+export default async function ProjectDetailPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { from } = await searchParams;
   const project = getProjectBySlug(slug);
   if (!project) notFound();
 
-  const index = projects.findIndex((p) => p.slug === project.slug) + 1;
+  // Go back to wherever the reader actually came from. The home page tags its
+  // links with ?from=home, the All Work grid tags its cards with ?from=work,
+  // and anything else (a shared link, a search result) lands on All Work,
+  // which is where the project lives in the site's own hierarchy.
+  const cameFromHome = from === "home";
+  const backHref = cameFromHome ? "/#projects" : "/projects";
+  const backLabel = cameFromHome ? "Back to portfolio" : "Back to all work";
+
   const isCode = project.linkLabel.toLowerCase().includes("code");
+  // Prefer the deployed site over the repository when both exist, so the
+  // window's address bar points at the thing you can actually try.
+  const windowUrl = (() => {
+    const candidates = [project.link, ...(project.modal?.links ?? []).map((l) => l.url)];
+    const external = candidates.filter((url) => /^https?:\/\//i.test(url));
+    return external.find((url) => !/github\.com/i.test(url)) ?? external[0] ?? project.link;
+  })();
+  // Address as a browser would show it: no protocol, no www, no trailing slash.
+  const windowAddress = (() => {
+    try {
+      const url = new URL(windowUrl);
+      const path = url.pathname.replace(/\/$/, "");
+      return `${url.host.replace(/^www\./, "")}${path}`;
+    } catch {
+      return project.title;
+    }
+  })();
 
   // `modal.body` is the long-form copy and may contain light HTML markup such
   // as <br />, so it is split into paragraphs and rendered as HTML. Fall back
@@ -39,8 +65,8 @@ export default async function ProjectDetailPage({ params }: Props) {
     <div className="subpage-shell">
       <header className="subpage-header navbar-bar">
         <div className="navbar-inner">
-          <Link href="/projects" className="navbar-link">
-            ← Back to work
+          <Link href={backHref} className="navbar-link">
+            ← {backLabel}
           </Link>
           <Link href="/" className="navbar-name">
             Harsh Upadhyay
@@ -49,7 +75,6 @@ export default async function ProjectDetailPage({ params }: Props) {
       </header>
 
       <main className="subpage-main project-detail">
-        <p className="project-detail-index">{String(index).padStart(2, "0")}</p>
         <h1 className="project-detail-title">{project.title}</h1>
 
         <div className="project-detail-tags">
@@ -59,16 +84,33 @@ export default async function ProjectDetailPage({ params }: Props) {
           ))}
         </div>
 
-        <div className="project-detail-hero">
-          <div className="project-detail-hero-chrome" aria-hidden="true">
-            <span className="project-detail-hero-dot" />
-            <span className="project-detail-hero-dot" />
-            <span className="project-detail-hero-dot" />
+        <figure className="project-window">
+          <div className="project-window-bar">
+            <div className="project-window-lights" aria-hidden="true">
+              <span className="project-window-light project-window-light-close" />
+              <span className="project-window-light project-window-light-min" />
+              <span className="project-window-light project-window-light-max" />
+            </div>
+            <span className="project-window-title">{windowAddress}</span>
+            <a
+              href={windowUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="project-window-open"
+              aria-label={`Open ${project.title} in a new tab`}
+            >
+              <span aria-hidden="true">↗</span>
+            </a>
           </div>
-          <div className="project-detail-hero-frame">
-            <img src={project.modal.image} alt="" loading="eager" decoding="async" />
+          <div className="project-window-screen">
+            <img
+              src={project.modal.image}
+              alt={`${project.title} interface`}
+              loading="eager"
+              decoding="async"
+            />
           </div>
-        </div>
+        </figure>
 
         <div className="project-detail-body">
           <div className="project-detail-description">
@@ -105,8 +147,8 @@ export default async function ProjectDetailPage({ params }: Props) {
         </div>
 
         <div className="project-detail-footer-nav">
-          <Link href="/projects" className="subpage-back-link">
-            <span aria-hidden="true">←</span> Back to all work
+          <Link href={backHref} className="subpage-back-link">
+            <span aria-hidden="true">←</span> {backLabel}
           </Link>
         </div>
       </main>

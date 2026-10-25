@@ -8,6 +8,7 @@ import About from "@/components/sections/About";
 import Experience from "@/components/sections/Experience";
 import Research from "@/components/sections/Research";
 import Projects from "@/components/sections/Projects";
+import { showCursorLabel, hideCursorLabel } from "@/components/layout/SiteCursor";
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useModal } from "@/hooks/useModal";
 import type { ExperienceModal } from "@/data/portfolio";
@@ -40,13 +41,7 @@ export default function Home() {
   const [showAnnouncement, setShowAnnouncement] = useState(true);
 
   const { activeSection, showBackToTop, progressFillRef, getMaxScroll } = useScrollProgress();
-  const { activeModal, modalSection, openModal, closeModal, drawerCloseRef } = useModal();
-
-  // Custom "plus" cursor refs
-  const cursorRafRef = useRef<number>(0);
-  const cursorPendingRef = useRef<{ x: number; y: number } | null>(null);
-  const cursorLabelRef = useRef<HTMLDivElement>(null);
-  const siteCursorRef = useRef<HTMLDivElement>(null);
+  const { activeModal, modalSection, modalDetailHref, openModal, closeModal, drawerCloseRef } = useModal();
 
   // Drawer image/body readiness (fade-in + placeholder while assets decode)
   const decodedDrawerImagesRef = useRef<Set<string>>(new Set());
@@ -135,92 +130,12 @@ export default function Home() {
     });
   }, []);
 
-  const handleCardClick = useCallback((modal: ExperienceModal, section: string, trigger: HTMLElement) => {
-    openModal(modal, section, trigger);
-  }, [openModal]);
-
-  // Enable the custom cursor only on devices with a real mouse (fine pointer + hover).
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const sync = () => {
-      document.body.classList.toggle("custom-cursor-on", mq.matches);
-      if (!mq.matches) {
-        document.body.classList.remove("custom-cursor-visible");
-        if (cursorLabelRef.current) cursorLabelRef.current.classList.remove("visible");
-      }
-    };
-    sync();
-    mq.addEventListener("change", sync);
-    return () => {
-      mq.removeEventListener("change", sync);
-      document.body.classList.remove("custom-cursor-on");
-      document.body.classList.remove("custom-cursor-visible");
-    };
-  }, []);
-
-  // Track the pointer and move the cursor + label, batched via rAF.
-  useEffect(() => {
-    const showSiteCursor = () => {
-      if (document.body.classList.contains("custom-cursor-on")) {
-        document.body.classList.add("custom-cursor-visible");
-      }
-    };
-    const hideSiteCursor = () => {
-      document.body.classList.remove("custom-cursor-visible");
-      if (cursorLabelRef.current) cursorLabelRef.current.classList.remove("visible");
-    };
-    const flushCursor = () => {
-      cursorRafRef.current = 0;
-      const pending = cursorPendingRef.current;
-      if (!pending) return;
-      if (cursorLabelRef.current) {
-        cursorLabelRef.current.style.transform = `translate3d(${pending.x + 16}px, ${pending.y + 16}px, 0)`;
-      }
-      if (siteCursorRef.current) {
-        siteCursorRef.current.style.transform = `translate3d(${pending.x - 17}px, ${pending.y - 17}px, 0)`;
-      }
-      cursorPendingRef.current = null;
-    };
-    const onPointerMove = (e: PointerEvent) => {
-      showSiteCursor();
-      cursorPendingRef.current = { x: e.clientX, y: e.clientY };
-      if (!cursorRafRef.current) cursorRafRef.current = window.requestAnimationFrame(flushCursor);
-    };
-    const onRootMouseEnter = () => showSiteCursor();
-    const onRootMouseLeave = () => hideSiteCursor();
-    const onVisibilityChange = () => {
-      if (document.visibilityState !== "visible") hideSiteCursor();
-    };
-    const onWindowBlur = () => hideSiteCursor();
-    const rootEl = document.documentElement;
-    window.addEventListener("pointermove", onPointerMove, { passive: true });
-    rootEl.addEventListener("mouseenter", onRootMouseEnter);
-    rootEl.addEventListener("mouseleave", onRootMouseLeave);
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    window.addEventListener("blur", onWindowBlur);
-    return () => {
-      window.removeEventListener("pointermove", onPointerMove);
-      rootEl.removeEventListener("mouseenter", onRootMouseEnter);
-      rootEl.removeEventListener("mouseleave", onRootMouseLeave);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      window.removeEventListener("blur", onWindowBlur);
-      if (cursorRafRef.current) window.cancelAnimationFrame(cursorRafRef.current);
-      document.body.classList.remove("custom-cursor-visible");
-    };
-  }, []);
-
-  // Optional: pass these down to cards if you want hover labels like "View project"
-  const showCursor = useCallback((text: string) => {
-    const el = cursorLabelRef.current;
-    if (!el) return;
-    if (el.textContent !== text) el.textContent = text;
-    el.classList.add("visible");
-  }, []);
-  const hideCursor = useCallback(() => {
-    const el = cursorLabelRef.current;
-    if (!el) return;
-    el.classList.remove("visible");
-  }, []);
+  const handleCardClick = useCallback(
+    (modal: ExperienceModal, section: string, trigger: HTMLElement, detailHref?: string) => {
+      openModal(modal, section, trigger, detailHref);
+    },
+    [openModal]
+  );
 
   const showLandingAnnouncement = showAnnouncement && activeSection === "" && !showBackToTop;
 
@@ -269,9 +184,9 @@ export default function Home() {
       <main id="top">
         <Hero greeting={greeting} />
         <About onProgress={handleProgress("about")} revealed={!!revealed.about} />
-        <Experience onProgress={handleProgress("experience")} revealed={!!revealed.experience} onCardClick={handleCardClick} showCursor={showCursor} hideCursor={hideCursor} />
-        <Research onProgress={handleProgress("research")} revealed={!!revealed.research} onCardClick={handleCardClick} showCursor={showCursor} hideCursor={hideCursor} />
-        <Projects onProgress={handleProgress("projects")} revealed={!!revealed.projects} onCardClick={handleCardClick} showCursor={showCursor} hideCursor={hideCursor} />
+        <Experience onProgress={handleProgress("experience")} revealed={!!revealed.experience} onCardClick={handleCardClick} showCursor={showCursorLabel} hideCursor={hideCursorLabel} />
+        <Research onProgress={handleProgress("research")} revealed={!!revealed.research} onCardClick={handleCardClick} showCursor={showCursorLabel} hideCursor={hideCursorLabel} />
+        <Projects onProgress={handleProgress("projects")} revealed={!!revealed.projects} onCardClick={handleCardClick} showCursor={showCursorLabel} hideCursor={hideCursorLabel} />
       </main>
 
       <Footer />
@@ -279,6 +194,7 @@ export default function Home() {
       <Drawer
         activeModal={activeModal}
         modalSection={modalSection}
+        modalDetailHref={modalDetailHref}
         closeModal={closeModal}
         drawerCloseRef={drawerCloseRef}
         drawerImageReady={drawerImageReady}
@@ -293,8 +209,6 @@ export default function Home() {
         Back to top
       </button>
 
-      <div ref={siteCursorRef} className="site-cursor-plus" aria-hidden="true" />
-      <div ref={cursorLabelRef} className="cursor-label" aria-hidden="true" />
     </div>
   );
 }

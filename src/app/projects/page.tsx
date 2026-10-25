@@ -52,7 +52,7 @@ export default function AllWorkPage() {
           {filteredProjects.map((proj) => (
             <Link
               key={proj.slug}
-              href={`/projects/${proj.slug}`}
+              href={`/projects/${proj.slug}?from=work`}
               className="work-card"
               role="listitem"
             >

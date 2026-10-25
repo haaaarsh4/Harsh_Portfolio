@@ -8,7 +8,7 @@ interface Props {
   onProgress: (p: number) => void;
   revealed: boolean;
   nightMode?: boolean;
-  onCardClick: (modal: ExperienceModal, section: string, trigger: HTMLElement) => void;
+  onCardClick: (modal: ExperienceModal, section: string, trigger: HTMLElement, detailHref?: string) => void;
   showCursor?: (text: string) => void;
   hideCursor?: () => void;
 }
@@ -45,11 +45,13 @@ export default function Experience({ onProgress, revealed, nightMode = false, on
                     role="listitem"
                     tabIndex={0}
                     style={{ animationDelay: `${i * 60}ms` }}
-                    onClick={(e) => onCardClick(exp.modal, "experience", e.currentTarget)}
+                    onClick={(e) =>
+                      onCardClick(exp.modal, "experience", e.currentTarget, `/experience/${exp.slug}`)
+                    }
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        onCardClick(exp.modal, "experience", e.currentTarget);
+                        onCardClick(exp.modal, "experience", e.currentTarget, `/experience/${exp.slug}`);
                       }
                     }}
                     onMouseEnter={() => showCursor?.("View details")}

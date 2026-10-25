@@ -5,14 +5,16 @@ import type { ExperienceModal } from "@/data/portfolio";
 export function useModal() {
   const [activeModal, setActiveModal] = useState<ExperienceModal | null>(null);
   const [modalSection, setModalSection] = useState("");
+  const [modalDetailHref, setModalDetailHref] = useState<string | null>(null);
   const drawerTriggerRef = useRef<HTMLElement | null>(null);
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
 
   const openModal = useCallback(
-    (modal: ExperienceModal, section: string, trigger?: HTMLElement) => {
+    (modal: ExperienceModal, section: string, trigger?: HTMLElement, detailHref?: string) => {
       drawerTriggerRef.current = trigger ?? null;
       setActiveModal(modal);
       setModalSection(section);
+      setModalDetailHref(detailHref ?? null);
     },
     []
   );
@@ -20,10 +22,19 @@ export function useModal() {
   const closeModal = useCallback(() => {
     setActiveModal(null);
     setModalSection("");
+    setModalDetailHref(null);
     if (drawerTriggerRef.current) {
       drawerTriggerRef.current.focus();
       drawerTriggerRef.current = null;
     }
+  }, []);
+
+  // The drawer can now navigate to a story page, so make sure the scroll lock
+  // never survives the unmount of the home page.
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, []);
 
   // Lock scroll when drawer is open
@@ -61,5 +72,12 @@ export function useModal() {
     return () => window.removeEventListener("keydown", handler);
   }, [activeModal, closeModal]);
 
-  return { activeModal, modalSection, openModal, closeModal, drawerCloseRef };
+  return {
+    activeModal,
+    modalSection,
+    modalDetailHref,
+    openModal,
+    closeModal,
+    drawerCloseRef,
+  };
 }
